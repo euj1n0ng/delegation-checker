@@ -1,3 +1,4 @@
+import {SECURITY_SCHEME_SPEC} from '@loopback/authentication-jwt';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {
@@ -8,9 +9,9 @@ import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
-import {PasswordHasherBindings} from './keys';
+import {PasswordHasherBindings, TokenServiceBindings, TokenServiceConstants, UserServiceBindings} from './keys';
 import {MySequence} from './sequence';
-import {BcryptHasher} from './services';
+import {BcryptHasher, JWTService, MyUserService} from './services';
 
 export {ApplicationConfig};
 
@@ -22,6 +23,9 @@ export class BackendApplication extends BootMixin(
     
     // Set up binding
     this.setupBinding();
+
+    // Add security spec
+    this.addSecuritySpec();
 
     // Set up the custom sequence
     this.sequence(MySequence);
@@ -50,5 +54,28 @@ export class BackendApplication extends BootMixin(
   setupBinding(): void {
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
     this.bind(PasswordHasherBindings.ROUNDS).to(10);
+    this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
+    this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
+    this.bind(TokenServiceBindings.TOKEN_SECRET).to(TokenServiceConstants.TOKEN_SECRET_VALUE)
+    this.bind(TokenServiceBindings.TOKEN_EXPIRES_IN).to(TokenServiceConstants.TOKEN_EXPIRES_IN_VALUE);
+  }
+
+  addSecuritySpec(): void {
+    this.api({
+      openapi: '3.0.0',
+      info: {
+        title: 'Delegation Checker',
+        version: '1.0.0',
+      },
+      paths: {},
+      components: {securitySchemes: SECURITY_SCHEME_SPEC},
+      security: [
+        {
+          // secure all endpoints with 'jwt'
+          jwt: [],
+        },
+      ],
+      servers: [{url: '/'}],
+    });
   }
 }
