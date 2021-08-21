@@ -1,3 +1,4 @@
+import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
 import {SECURITY_SCHEME_SPEC} from '@loopback/authentication-jwt';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
@@ -9,6 +10,7 @@ import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
+import {JWTStrategy} from './auth-strategies/jwt.strategy';
 import {PasswordHasherBindings, TokenServiceBindings, TokenServiceConstants, UserServiceBindings} from './keys';
 import {MySequence} from './sequence';
 import {BcryptHasher, JWTService, MyUserService} from './services';
@@ -26,6 +28,9 @@ export class BackendApplication extends BootMixin(
 
     // Add security spec
     this.addSecuritySpec();
+    
+    this.component(AuthenticationComponent);
+    registerAuthenticationStrategy(this, JWTStrategy)
 
     // Set up the custom sequence
     this.sequence(MySequence);
