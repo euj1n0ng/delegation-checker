@@ -14,3 +14,8 @@ export class UserRepository extends DefaultCrudRepository<
     super(User, dataSource);
   }
 }
+
+export type Credentials = {
+  email: string;
+  password: string;
+}
