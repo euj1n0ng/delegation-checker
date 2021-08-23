@@ -1,24 +1,35 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Switch } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import UserContext from './UserContext';
+import { PrivateRoute, PublicRoute } from './components/Routes';
+import Login from './pages/Login';
+import Home from './pages/Home';
 
 function App() {
+  const [user, setUser] = useState({
+    loginToken: window.sessionStorage.getItem('loginToken'),
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserContext.Provider value={{ user, setUser: (e) => setUser({ ...user, ...e }) }}>
+      <Router>
+        <Switch>
+          <PublicRoute path='/login'>
+            <Login />
+          </PublicRoute>
+
+          <PublicRoute path='/signup'>
+            <Login isSignup />
+          </PublicRoute>
+
+          <PrivateRoute path='/'>
+            <Home />
+          </PrivateRoute>
+        </Switch>
+      </Router>
+    </UserContext.Provider>
   );
 }
 
