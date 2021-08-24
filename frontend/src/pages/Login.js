@@ -13,7 +13,7 @@ export default function Login({isSignup}) {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(undefined);
+  const [error, setError] = useState('');
 
   async function handleSubmit(event) {
     event.preventDefault();
