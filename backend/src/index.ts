@@ -1,4 +1,6 @@
 import {ApplicationConfig, BackendApplication} from './application';
+const dotenv = require('dotenv');
+dotenv.config();
 
 export * from './application';
 
